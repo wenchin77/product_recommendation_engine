@@ -33,8 +33,7 @@ namespace product_recommendation
                 var resultList = engine.applyRules();
                 // Console.WriteLine(JsonSerializer.Serialize(resultList));
 
-                resultList.GroupBy(a => a.Id).Select(a => new { Weight = a.Sum(b => b.RuleWeight.Values), Name = a.Key}).
-
+                // to be added: sum & groupby -> recommended product sorting
                 foreach (var item in resultList)
                 {
                     byte[] nameInBytes = JsonSerializer.SerializeToUtf8Bytes<string>(repo[item.Id].Name);
