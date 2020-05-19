@@ -25,11 +25,7 @@ namespace product_recommendation
 
     public class Repo
     {
-        // to be updated: make this into an interface -> DI
-        public Product GetProduct(int id)
-        {
-            return productRepo[id];
-        }
+        // to be updated: make this into an interface (w/ GetProduct method) -> DI
         public Dictionary<int, Product> productRepo = new Dictionary<int, Product>
         {
             { 1, new Product(1, "衛生紙", "FMCG", 100, 1000, 1000, 4.1) },

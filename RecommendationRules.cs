@@ -6,19 +6,16 @@ namespace product_recommendation
 {
     public interface IRecommendationRule
     {
-        int RuleId { get; set; }
+        int RuleId { get; }
+        string RuleDescription { get; }
         IEnumerable<int> recommend(int id, Dictionary<int, Product> productRepo);
     }
 
     // 實作推薦方法
     public class TopSales : IRecommendationRule
     {
-        public int RuleId { get; set; }
-        public TopSales(int ruleId)
-        {
-            RuleId = ruleId;
-        }
-
+        public int RuleId => 1;
+        public string RuleDescription => "Quantity sold over 500";
         public IEnumerable<int> recommend(int id, Dictionary<int, Product> productRepo)
         {
             var exList = new List<int> { id };
@@ -29,11 +26,8 @@ namespace product_recommendation
 
     public class TopScore : IRecommendationRule
     {
-        public int RuleId { get; set; }
-        public TopScore(int ruleId)
-        {
-            RuleId = ruleId;
-        }
+        public int RuleId => 2;
+        public string RuleDescription => "Score over 4.0";
         public IEnumerable<int> recommend(int id, Dictionary<int, Product> productRepo)
         {
             var exList = new List<int> { id };
@@ -44,11 +38,8 @@ namespace product_recommendation
 
     public class SameCategory : IRecommendationRule
     {
-        public int RuleId { get; set; }
-        public SameCategory(int ruleId)
-        {
-            RuleId = ruleId;
-        }
+        public int RuleId => 3;
+        public string RuleDescription => "Products within the same category";
         public IEnumerable<int> recommend(int id, Dictionary<int, Product> productRepo)
         {
             var exList = new List<int> { id };

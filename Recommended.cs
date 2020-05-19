@@ -3,14 +3,15 @@ namespace product_recommendation
 {
     public class Recommended
     {
-        public int Id;
-        public int RuleId;
-        public float RuleWeight;
-        public Recommended(int id, int ruleId, float ruleWeight)
+        public int ProductId { get; }
+        public IRecommendationRule Rule { get; }
+        public float RuleWeight { get; }
+        public Recommended(int ProductId, IRecommendationRule Rule, float RuleWeight)
         {
-            Id = id;
-            RuleId = ruleId;
-            RuleWeight = ruleWeight;
+            this.ProductId = ProductId;
+            this.Rule = Rule;
+            this.RuleWeight = RuleWeight;
         }
+
     }
 }
