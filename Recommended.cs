@@ -4,11 +4,12 @@ namespace product_recommendation
     public class Recommended
     {
         public int Id;
-        // { rule no, rule weight }
-        public Dictionary<int, float> RuleWeight;
-        public Recommended(int id, Dictionary<int, float> ruleWeight)
+        public int RuleId;
+        public float RuleWeight;
+        public Recommended(int id, int ruleId, float ruleWeight)
         {
             Id = id;
+            RuleId = ruleId;
             RuleWeight = ruleWeight;
         }
     }

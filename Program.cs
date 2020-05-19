@@ -16,6 +16,7 @@ namespace product_recommendation
                 { new SameCategory(3), 0.3f }
             };
 
+            // to be updated -> DI
             var repo = new Repo().productRepo;
 
             try
@@ -29,20 +30,17 @@ namespace product_recommendation
                 }
 
                 Engine engine = new Engine(id, ruleDict, repo);
+                IEnumerable<Recommended> resultList = engine.applyRules();
 
-                var resultList = engine.applyRules();
-                // Console.WriteLine(JsonSerializer.Serialize(resultList));
-
-                // to be added: sum & groupby -> recommended product sorting
-                foreach (var item in resultList)
+                var recommended = (from result in resultList group result by new { result.Id } into g 
+                select new { Id = g.Key.Id, WeightedScore = g.Sum(result => result.RuleWeight) }).ToArray();
+                
+                foreach (var item in recommended.OrderByDescending(x => x.WeightedScore).ThenBy(x => x.Id).Take(10))
                 {
                     byte[] nameInBytes = JsonSerializer.SerializeToUtf8Bytes<string>(repo[item.Id].Name);
-                    Console.Write($"商品 ID {item.Id}, 名稱 {JsonSerializer.Deserialize<string>(nameInBytes)} - ");
-                    foreach (var ruleWeight in item.RuleWeight)
-                    {
-                        Console.WriteLine($"規則 #{ruleWeight.Key.ToString()}, 權重 {ruleWeight.Value}");
-                    }
+                    Console.WriteLine($"商品 ID {item.Id}, 名稱 {JsonSerializer.Deserialize<string>(nameInBytes)}, 推薦分數 {item.WeightedScore}");
                 }
+
             }
             catch (Exception e)
             {

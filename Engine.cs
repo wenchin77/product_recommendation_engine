@@ -23,9 +23,7 @@ namespace product_recommendation
                 foreach (var item in recommended)
                 {
                     // 要回傳的商品格式為 Recommended
-                    Recommended result = new Recommended(item, new Dictionary<int, float>(){
-                        { rule.RuleId, RuleDict[rule] }
-                    });
+                    Recommended result = new Recommended(item, rule.RuleId, RuleDict[rule]);
                     yield return result;
                 }
             }
