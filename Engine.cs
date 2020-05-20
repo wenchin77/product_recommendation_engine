@@ -15,7 +15,7 @@ namespace product_recommendation
 
         public IEnumerable<Recommended> applyRules(int productId)
         {
-            var category = ProductRepo[productId].Category;
+            var category = (RuleConfig.ContainsKey(ProductRepo[productId].Category)) ? ProductRepo[productId].Category : "Default";
             return RuleConfig[category].SelectMany(x => x.Item1.recommend(productId, ProductRepo).Select(y => new Recommended(y, x.Item1, x.Item2)));
         }
     }

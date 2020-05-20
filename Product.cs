@@ -47,7 +47,7 @@ namespace product_recommendation
             { 17, new Product(17, "西裝", "Fashion", 4500, 1000, 200, 4.0) },
             { 18, new Product(18, "帽子", "Fashion", 5500, 160, 100, 3.0) },
             { 19, new Product(19, "項鍊", "Fashion", 6500, 170, 500, 4.3) },
-            { 20, new Product(20, "鞋子", "Fashion", 7500, 180, 400, 4.6) }
+            { 20, new Product(20, "玩具", "Entertainment", 7500, 180, 400, 4.6) }
         };
 
     }

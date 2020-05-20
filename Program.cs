@@ -1,5 +1,4 @@
-﻿using System.Collections;
-using System.Linq;
+﻿using System.Linq;
 using System.Collections.Generic;
 using System;
 using System.Text.Json;
@@ -30,25 +29,28 @@ namespace product_recommendation
             var rule3 = new SameCategory();
             AddRuleToConfig("FMCG", (rule1, 0.5f), (rule2, 0.2f), (rule3, 0.3f));
             AddRuleToConfig("Electronics", (rule1, 0.1f), (rule2, 0.3f), (rule3, 0.6f));
-            AddRuleToConfig("Fashion", (rule1, 0), (rule2, 0.1f), (rule3, 0.9f));
+            AddRuleToConfig("Fashion", (rule2, 0.1f), (rule3, 0.9f));
+            AddRuleToConfig("Default", (rule1, 1f));
 
             var engine = new Engine(ruleConfig, repo);
-            IEnumerable<Recommended> resultList = engine.applyRules(id);
-            var recommended = (from result in resultList
+            IEnumerable<Recommended> resultEnum = engine.applyRules(id);
+
+            var recommended = (from result in resultEnum
                                group result by new { result.ProductId } into g
                                select new
                                {
-                                   Id = g.Key.ProductId,
-                                   WeightedScore = g.Sum(result => result.RuleWeight),
-                                   Rules = new ArrayList() { g.Select(x => x.Rule.RuleDescription) },
+                                   productId = g.Key.ProductId,
+                                   weightedScore = g.Sum(x => x.RuleWeight),
+                                   rules = g.Select(x => x.Rule.RuleDescription)
                                });
-            foreach (var item in recommended.OrderByDescending(x => x.WeightedScore).ThenBy(x => x.Id).Take(10))
+
+            foreach (var item in recommended.OrderByDescending(x => x.weightedScore).ThenBy(x => x.productId).Take(10))
             {
-                var pid = item.Id;
+                var pid = item.productId;
                 byte[] nameInBytes = JsonSerializer.SerializeToUtf8Bytes<string>(repo[pid].Name);
                 var name = JsonSerializer.Deserialize<string>(nameInBytes);
-                var score = item.WeightedScore;
-                var rules = JsonSerializer.Serialize(item.Rules);
+                var score = item.weightedScore;
+                var rules = JsonSerializer.Serialize(item.rules);
                 Console.WriteLine($"ID {pid} {name}, 類別 {repo[pid].Category}, 價格 {repo[pid].Price}, 推薦分數 {score}, 推薦規則 {rules}");
             }
         }
