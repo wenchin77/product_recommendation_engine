@@ -5,25 +5,18 @@ namespace product_recommendation
 {
     public class Engine
     {
-        public int ProductId { get; }
         public Dictionary<string, (IRecommendationRule rule, float weight)[]> RuleConfig { get; }
         public Dictionary<int, Product> ProductRepo { get; }
-        public Engine(int productId, Dictionary<string, (IRecommendationRule rule, float weight)[]> ruleConfig, Dictionary<int, Product> productRepo)
+        public Engine(Dictionary<string, (IRecommendationRule rule, float weight)[]> ruleConfig, Dictionary<int, Product> productRepo)
         {
-            ProductId = productId;
             RuleConfig = ruleConfig;
             ProductRepo = productRepo;
         }
 
-        public IEnumerable<Recommended> applyRules()
+        public IEnumerable<Recommended> applyRules(int productId)
         {
-            var category = ProductRepo[ProductId].Category;
-            foreach (var ruleTuple in RuleConfig[category])
-            {
-                var rule = ruleTuple.Item1;
-                var weight = ruleTuple.Item2;
-                return rule.recommend(ProductId, ProductRepo).Select(x => new Recommended(x, rule, weight));
-            }
+            var category = ProductRepo[productId].Category;
+            return RuleConfig[category].SelectMany(x => x.Item1.recommend(productId, ProductRepo).Select(y => new Recommended(y, x.Item1, x.Item2)));
         }
     }
 }
