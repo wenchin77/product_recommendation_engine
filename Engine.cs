@@ -1,31 +1,28 @@
+using System.Linq;
 using System.Collections.Generic;
 
 namespace product_recommendation
 {
     public class Engine
     {
-        public int Id;
-        public Dictionary<string, Dictionary<IRecommendationRule, float>> RuleConfig;
-        public Dictionary<int, Product> ProductRepo;
-        public Engine(int id, Dictionary<string, Dictionary<IRecommendationRule, float>> ruleConfig, Dictionary<int, Product> productRepo)
+        public int ProductId { get; }
+        public Dictionary<string, (IRecommendationRule rule, float weight)[]> RuleConfig { get; }
+        public Dictionary<int, Product> ProductRepo { get; }
+        public Engine(int productId, Dictionary<string, (IRecommendationRule rule, float weight)[]> ruleConfig, Dictionary<int, Product> productRepo)
         {
-            Id = id;
+            ProductId = productId;
             RuleConfig = ruleConfig;
             ProductRepo = productRepo;
         }
 
         public IEnumerable<Recommended> applyRules()
         {
-            var category = ProductRepo[Id].Category;
-            foreach (var rule in RuleConfig[category].Keys)
+            var category = ProductRepo[ProductId].Category;
+            foreach (var ruleTuple in RuleConfig[category])
             {
-                IEnumerable<int> recommended = rule.recommend(Id, ProductRepo);
-                foreach (var item in recommended)
-                {
-                    var weight = RuleConfig[category][rule];
-                    Recommended result = new Recommended(item, rule, weight);
-                    yield return result;
-                }
+                var rule = ruleTuple.Item1;
+                var weight = ruleTuple.Item2;
+                return rule.recommend(ProductId, ProductRepo).Select(x => new Recommended(x, rule, weight));
             }
         }
     }

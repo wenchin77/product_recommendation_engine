@@ -8,40 +8,21 @@ namespace product_recommendation
 {
     class Program
     {
+        private static Dictionary<string, (IRecommendationRule rule, float weight)[]> ruleConfig = new Dictionary<string, (IRecommendationRule rule, float weight)[]>();
+        private static void AddConfig(string category, params (IRecommendationRule rule, float weight)[] rules)
+        {            
+            ruleConfig.Add(category, rules);
+        }
         static void Main(string[] args)
         {
             try
-            {
+            { 
                 var rule1 = new TopSales();
                 var rule2 = new TopScore();
                 var rule3 = new SameCategory();
-                var ruleConfig = new Dictionary<string, Dictionary<IRecommendationRule, float>>()
-                {
-                    {
-                        "FMCG", new Dictionary<IRecommendationRule, float>()
-                        {
-                            { rule1, 0.5f },
-                            { rule2, 0.2f },
-                            { rule3, 0.3f }
-                        }
-                    },
-                    {
-                        "Electronics", new Dictionary<IRecommendationRule, float>()
-                        {
-                            { rule1, 0.1f },
-                            { rule2, 0.3f },
-                            { rule3, 0.6f }
-                        }
-                    },
-                    {
-                        "Fashion", new Dictionary<IRecommendationRule, float>()
-                        {
-                            { rule1, 0 },
-                            { rule2, 0.1f },
-                            { rule3, 0.9f }
-                        }
-                    },
-                };
+                AddConfig("FMCG", (rule1, 0.5f), (rule2, 0.2f), (rule3, 0.3f));
+                AddConfig("Electronics", (rule1, 0.1f), (rule2, 0.3f), (rule3, 0.6f));
+                AddConfig("Fashion", (rule1, 0), (rule2, 0.1f), (rule3, 0.9f));
 
                 // to be updated -> DI
                 var repo = new Repo().productRepo;
@@ -55,7 +36,7 @@ namespace product_recommendation
                 }
 
                 Console.WriteLine($"輸入商品: {repo[id].Name}");
-                Console.WriteLine("推薦商品: ");
+                Console.WriteLine("推薦商品 TOP 10: ");
 
                 Engine engine = new Engine(id, ruleConfig, repo);
                 IEnumerable<Recommended> resultList = engine.applyRules();
@@ -66,7 +47,7 @@ namespace product_recommendation
                                    {
                                        Id = g.Key.ProductId,
                                        WeightedScore = g.Sum(result => result.RuleWeight),
-                                       Rules = new ArrayList() { g.Select(x => x.Rule.RuleDescription) },
+                                       Rules = new ArrayList(){ g.Select(x => x.Rule.RuleDescription) },
                                    });
                 foreach (var item in recommended.OrderByDescending(x => x.WeightedScore).ThenBy(x => x.Id).Take(10))
                 {

@@ -10,7 +10,6 @@ namespace product_recommendation
         string RuleDescription { get; }
         IEnumerable<int> recommend(int id, Dictionary<int, Product> productRepo);
     }
-
     // 實作推薦方法
     public class TopSales : IRecommendationRule
     {
