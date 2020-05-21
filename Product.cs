@@ -26,7 +26,7 @@ namespace product_recommendation
     public class Repo
     {
         // to be updated: make this into an interface (w/ GetProduct method) -> DI
-        public Dictionary<int, Product> productRepo = new Dictionary<int, Product>
+        public IDictionary<int, Product> productRepo = new Dictionary<int, Product>
         {
             { 1, new Product(1, "衛生紙", "FMCG", 100, 1000, 1000, 4.1) },
             { 2, new Product(2, "泡麵", "FMCG", 200, 2000, 1000, 4.2) },

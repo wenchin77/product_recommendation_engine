@@ -7,15 +7,11 @@ namespace product_recommendation
 {
     class Program
     {
-        private static Dictionary<int, Product> repo = new Repo().productRepo;
-        private static Dictionary<string, (IRecommendationRule rule, float weight)[]> ruleConfig = new Dictionary<string, (IRecommendationRule rule, float weight)[]>();
-        private static void AddRuleToConfig(string category, params (IRecommendationRule rule, float weight)[] rules)
-        {
-            ruleConfig.Add(category, rules);
-        }
+        private static IDictionary<int, Product> repo = new Repo().productRepo;
         static void Main(string[] args)
         {
             Console.WriteLine("輸入商品 ID: ");
+            // id -> idList
             int id;
             while (!Int32.TryParse(Console.ReadLine(), out id) || !repo.ContainsKey(id))
             {
@@ -27,13 +23,12 @@ namespace product_recommendation
             var rule1 = new TopSales();
             var rule2 = new TopScore();
             var rule3 = new SameCategory();
-            AddRuleToConfig("FMCG", (rule1, 0.5f), (rule2, 0.2f), (rule3, 0.3f));
-            AddRuleToConfig("Electronics", (rule1, 0.1f), (rule2, 0.3f), (rule3, 0.6f));
-            AddRuleToConfig("Fashion", (rule2, 0.1f), (rule3, 0.9f));
-            AddRuleToConfig("Default", (rule1, 1f));
+            var ruleConfig = new RuleConfigBuilder().AddRuleToConfig("FMCG", (rule1, 0.5f), (rule2, 0.2f), (rule3, 0.3f))
+            .AddRuleToConfig("Electronics", (rule1, 0.1f), (rule2, 0.3f), (rule3, 0.6f))
+            .AddRuleToConfig("Fashion", (rule2, 0.1f), (rule3, 0.9f));
 
-            var engine = new Engine(ruleConfig, repo);
-            IEnumerable<Recommended> resultEnum = engine.applyRules(id);
+            var engine = new Engine(ruleConfig.GetConfig(), repo);
+            IEnumerable<Recommended> resultEnum = engine.run(id);
 
             var recommended = (from result in resultEnum
                                group result by new { result.ProductId } into g
