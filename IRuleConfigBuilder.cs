@@ -18,7 +18,7 @@ namespace product_recommendation
         private void Reset()
         {
             this._ruleConfig = new Dictionary<string, (IRecommendationRule rule, float weight)[]>();
-            AddRuleToConfig("Default", (new TopSales(), 1));
+            AddRuleToConfig("Default", (new TopSales(), 0.4f), (new SameCategory(), 0.6f));
         }
         public IRuleConfigBuilder AddRuleToConfig(string category, params (IRecommendationRule rule, float weight)[] rules)
         {

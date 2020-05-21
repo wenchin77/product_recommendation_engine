@@ -28,7 +28,7 @@ namespace product_recommendation
         // to be updated: make this into an interface (w/ GetProduct method) -> DI
         public IDictionary<int, Product> productRepo = new Dictionary<int, Product>
         {
-            { 1, new Product(1, "衛生紙", "FMCG", 100, 1000, 1000, 4.1) },
+            { 1, new Product(1, "衛生紙", "FMCG", 100, 1000, 100, 4.1) },
             { 2, new Product(2, "泡麵", "FMCG", 200, 2000, 1000, 4.2) },
             { 3, new Product(3, "餅乾", "FMCG", 300, 3000, 2000, 3.3) },
             { 4, new Product(4, "果汁", "FMCG", 400, 4000, 100, 4.4) },
@@ -46,8 +46,8 @@ namespace product_recommendation
             { 16, new Product(16, "洋裝", "Fashion", 3500, 900, 300, 3.9) },
             { 17, new Product(17, "西裝", "Fashion", 4500, 1000, 200, 4.0) },
             { 18, new Product(18, "帽子", "Fashion", 5500, 160, 100, 3.0) },
-            { 19, new Product(19, "項鍊", "Fashion", 6500, 170, 500, 4.3) },
-            { 20, new Product(20, "玩具", "Entertainment", 7500, 180, 400, 4.6) }
+            { 19, new Product(19, "拼圖", "Entertainment", 6500, 170, 500, 4.3) },
+            { 20, new Product(20, "樂高", "Entertainment", 7500, 180, 400, 4.6) }
         };
 
     }
