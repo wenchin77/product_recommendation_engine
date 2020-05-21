@@ -15,8 +15,15 @@ namespace product_recommendation
 
         public IEnumerable<Recommended> applyRules(int productId)
         {
-            var category = (RuleConfig.ContainsKey(ProductRepo[productId].Category)) ? ProductRepo[productId].Category : "Default";
-            return RuleConfig[category].SelectMany(x => x.Item1.recommend(productId, ProductRepo).Select(y => new Recommended(y, x.Item1, x.Item2)));
+            // var category = (RuleConfig.ContainsKey(ProductRepo[productId].Category)) ? ProductRepo[productId].Category : "Default";
+            // return RuleConfig[category].SelectMany(x => x.Item1.recommend(productId, ProductRepo).Select(y => new Recommended(y, x.Item1, x.Item2)));
+
+            (IRecommendationRule rule, float weight)[] rules;
+            if (!RuleConfig.TryGetValue(ProductRepo[productId].Category, out rules))
+            {
+                rules = RuleConfig["Default"];
+            }
+            return rules.SelectMany(x => x.Item1.recommend(productId, ProductRepo).Select(y => new Recommended(y, x.Item1, x.Item2)));
         }
     }
 }
