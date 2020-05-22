@@ -1,7 +1,9 @@
-﻿using System.Linq;
+﻿using System.Collections;
+using System.Linq;
 using System.Collections.Generic;
 using System;
 using System.Text.Json;
+using System.Text.RegularExpressions;
 
 namespace product_recommendation
 {
@@ -13,13 +15,21 @@ namespace product_recommendation
             while (true)
             {
                 Console.WriteLine("輸入商品 ID: ");
-                // 改改 id -> idList
-                int id;
-                while (!Int32.TryParse(Console.ReadLine(), out id) || !repo.ContainsKey(id))
+                var inputIdArray = new List<int>();
+                string input = Console.ReadLine();
+                string[] inputIdStrArray = Regex.Split(input, " ");
+                foreach (var st in inputIdStrArray)
                 {
-                    Console.WriteLine("商品不存在，請重新輸入 ID: ");
-                }
-                Console.WriteLine($"輸入商品: {repo[id].Name}");
+                    int id;
+                    if (!Int32.TryParse(st, out id) || !repo.ContainsKey(id))
+                    {
+                        Console.WriteLine($"商品 {st} 不存在");
+                        continue;
+                    }
+                    Console.WriteLine($"輸入商品: {st} {repo[id].Name}");
+                    inputIdArray.Add(id);
+                };
+
                 Console.WriteLine("推薦商品 TOP 10: ");
 
                 var rule1 = new TopSales();
@@ -30,24 +40,15 @@ namespace product_recommendation
                 .AddRuleToConfig("Fashion", (rule2, 0.1f), (rule3, 0.9f));
 
                 var engine = new Engine(ruleConfig.GetConfig(), repo);
-                IEnumerable<Recommended> resultEnum = engine.Run(new int[]{id});
+                var recommended = engine.Run(inputIdArray);
 
-                var recommended = (from result in resultEnum
-                                   group result by new { result.ProductId } into g
-                                   select new
-                                   {
-                                       productId = g.Key.ProductId,
-                                       weightedScore = g.Sum(x => x.RuleWeight),
-                                       rules = g.Select(x => x.Rule.RuleDescription)
-                                   });
-
-                foreach (var item in recommended.OrderByDescending(x => x.weightedScore).ThenBy(x => x.productId).Take(10))
+                foreach (var item in recommended.Take(10))
                 {
-                    var pid = item.productId;
+                    var pid = item.ProductId;
                     byte[] nameInBytes = JsonSerializer.SerializeToUtf8Bytes<string>(repo[pid].Name);
                     var name = JsonSerializer.Deserialize<string>(nameInBytes);
-                    var score = item.weightedScore;
-                    var rules = JsonSerializer.Serialize(item.rules);
+                    var score = item.RuleWeightSum;
+                    var rules = JsonSerializer.Serialize(item.Rules);
                     Console.WriteLine($"ID {pid} {name}, 類別 {repo[pid].Category}, 價格 {repo[pid].Price}, 推薦分數 {score}, 推薦規則 {rules}");
                 }
                 Console.WriteLine("-------");

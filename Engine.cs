@@ -1,3 +1,4 @@
+using System.Xml.Schema;
 using System.Linq;
 using System.Collections.Generic;
 
@@ -12,47 +13,27 @@ namespace product_recommendation
             RuleConfig = ruleConfig;
             ProductRepo = productRepo;
         }
-        // public IEnumerable<Recommended> Run(int productId)
-        // {
-        //     var rules = RuleConfig.TryGetValue(ProductRepo[productId].Category, out var r)
-        //     ? r : RuleConfig.TryGetValue("Default", out var d)
-        //     ? d : null;
-        //     if (rules == null) return Enumerable.Empty<Recommended>();
-        //     return rules.SelectMany(x => x.Item1.recommend(productId, ProductRepo).Select(y => new Recommended(y, x.Item1, x.Item2)));
-        // }
 
-        public IEnumerable<Recommended> Run(int[] productIdArr)
+        public IEnumerable<Recommended> Run(List<int> productIdArr)
         {
             var list = new List<Recommended>();
             foreach (var pid in productIdArr)
             {
-                // 拿出該商品的規則們
                 var rules = RuleConfig.TryGetValue(ProductRepo[pid].Category, out var r)
                 ? r : RuleConfig.TryGetValue("Default", out var d)
                 ? d : null;
 
-                // 用商品規則去篩選商品，產出 Recommended 回傳到 list
-                if (rules != null)
-                {
-                    var p = rules.SelectMany(x => x.Item1.recommend(pid, ProductRepo).Select(y => new Recommended(y, x.Item1, x.Item2)));
-                    list.AddRange(p);
-                }
-            }
+                if (rules == null) continue;
 
-            // 篩掉是 productIdArr 裡面的商品 ++
-
-            var recommended = from p in list
-                        group p by p.ProductId into g
-                        select new
-                        {
-                            ProductId = g.Key,
-                            RuleWeight = g.Sum(x => x.RuleWeight),
-                            rules = g.Select(x => x.Rule.RuleDescription)
-                        };
-            foreach (var item in recommended)
-            {
-                yield return item;
+                var productEnum = rules.SelectMany(x => x.Item1.recommend(pid, ProductRepo)
+                .Select(p => new Recommended(p, new string[] { x.Item1.RuleDescription }, x.Item2)));
+                list.AddRange(productEnum);
             }
+            return list.Where(x => !(productIdArr.Any(y => y == x.ProductId)))
+                .GroupBy(x => x.ProductId)
+                .Select(g => new Recommended(g.Key, g.SelectMany(x => x.Rules).Distinct(), g.Sum(x => x.RuleWeightSum)))
+                .OrderByDescending(x => x.RuleWeightSum)
+                .ThenBy(x => x.ProductId);
         }
     }
 }

@@ -4,13 +4,13 @@ namespace product_recommendation
     public class Recommended
     {
         public int ProductId { get; }
-        public IRecommendationRule Rule { get; }
-        public float RuleWeight { get; }
-        public Recommended(int ProductId, IRecommendationRule Rule, float RuleWeight)
+        public IEnumerable<string> Rules { get; }
+        public float RuleWeightSum { get; }
+        public Recommended(int ProductId, IEnumerable<string> Rules, float RuleWeightSum)
         {
             this.ProductId = ProductId;
-            this.Rule = Rule;
-            this.RuleWeight = RuleWeight;
+            this.Rules = Rules;
+            this.RuleWeightSum = RuleWeightSum;
         }
 
     }
