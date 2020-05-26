@@ -14,7 +14,7 @@ namespace product_recommendation
         {
             while (true)
             {
-                Console.WriteLine("輸入商品 ID: ");
+                Console.WriteLine("Product ID: ");
                 var inputIdArray = new List<int>();
                 string input = Console.ReadLine();
                 string[] inputIdStrArray = Regex.Split(input, " ");
@@ -23,14 +23,14 @@ namespace product_recommendation
                     int id;
                     if (!Int32.TryParse(st, out id) || !repo.ContainsKey(id))
                     {
-                        Console.WriteLine($"商品 {st} 不存在");
+                        Console.WriteLine($"Product {st} doesn't exist.");
                         continue;
                     }
-                    Console.WriteLine($"輸入商品: {st} {repo[id].Name}");
+                    Console.WriteLine($"Input product: {st} {repo[id].Name}");
                     inputIdArray.Add(id);
                 };
 
-                Console.WriteLine("推薦商品 TOP 10: ");
+                Console.WriteLine("Recommended products (top 10): ");
 
                 var rule1 = new TopSales();
                 var rule2 = new TopScore();
@@ -49,7 +49,7 @@ namespace product_recommendation
                     var name = JsonSerializer.Deserialize<string>(nameInBytes);
                     var score = item.RuleWeightSum;
                     var rules = JsonSerializer.Serialize(item.Rules);
-                    Console.WriteLine($"ID {pid} {name}, 類別 {repo[pid].Category}, 價格 {repo[pid].Price}, 推薦分數 {score}, 推薦規則 {rules}");
+                    Console.WriteLine($"ID {pid} {name}, {repo[pid].Category}, ${repo[pid].Price}, recommendation score {score}, recommendation rules {rules}");
                 }
                 Console.WriteLine("-------");
             }

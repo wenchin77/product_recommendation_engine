@@ -6,14 +6,12 @@ namespace product_recommendation
 {
     public interface IRecommendationRule
     {
-        int RuleId { get; }
         string RuleDescription { get; }
         IEnumerable<int> recommend(int id, IDictionary<int, Product> productRepo);
     }
     // 實作推薦方法
     public class TopSales : IRecommendationRule
     {
-        public int RuleId => 1;
         public string RuleDescription => "Quantity sold over 500";
         public IEnumerable<int> recommend(int id, IDictionary<int, Product> productRepo)
         {
@@ -24,7 +22,6 @@ namespace product_recommendation
 
     public class TopScore : IRecommendationRule
     {
-        public int RuleId => 2;
         public string RuleDescription => "Score over 4.0";
         public IEnumerable<int> recommend(int id, IDictionary<int, Product> productRepo)
         {
@@ -35,7 +32,6 @@ namespace product_recommendation
 
     public class SameCategory : IRecommendationRule
     {
-        public int RuleId => 3;
         public string RuleDescription => "Products within the same category";
         public IEnumerable<int> recommend(int id, IDictionary<int, Product> productRepo)
         {
